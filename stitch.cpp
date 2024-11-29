@@ -72,7 +72,7 @@ string seam_find_type = "gc_color";
 // 曝光补偿
 //（分块增益补偿：GAIN_BLOCKS、全局增益补偿：GAIN、不补偿：no）
 //（按RGB全局增益补偿：CHANNELS、按RGB分块补偿：CHANNELS_BLOCKS）
-int expos_comp_type = ExposureCompensator::GAIN;
+int expos_comp_type = ExposureCompensator::NO;
 int expos_comp_nr_feeds = 1; // 补偿迭代次数
 int expos_comp_nr_filtering = 2; // 增益过滤迭代次数
 int expos_comp_block_size = 32; // 分块大小

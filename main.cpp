@@ -8,7 +8,7 @@ vector<string> img_names;
 int main()
 {
     TicToc time;
-    int skepCount = 5;
+    int skepCount = 15;
 
     string data_path = "C:/Users/Administrator/Desktop/stitch_code/data1/*.jpg";
     vector<string> pre_path;
