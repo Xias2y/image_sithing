@@ -29,24 +29,24 @@ string features_type = "orb";
 float match_conf = 0.3f;
 #endif
 // 匹配算法（透视：homography、仿射：affine）
-string matcher_type = "affine";
+string matcher_type = "homography";
 // 图像匹配范围（-1：全连接）（不想全连接只能homography）
-int range_width = -1;
+int range_width = 1;
 // 几何变换估计器
 string estimator_type = "homography";
 // BA代价函数
 //（最小化重投影误差：reproj、最小化光线误差：ray、最小化仿射误差：affine、不调整：no）
-string ba_cost_func = "ray";
+string ba_cost_func = "reproj";
 // BA优化参数（<fx><skew><ppx><aspect><ppy>）
 // x表示优化，_表示不优化
 string ba_refine_mask = "x_x_x";
 // 波形效应矫正（水平方向：WAVE_CORRECT_HORIZ、垂直方向：WAVE_CORRECT_VERT）
-bool do_wave_correct = false;
+bool do_wave_correct = true;
 WaveCorrectKind wave_correct = detail::WAVE_CORRECT_VERT;
 // 是否保存匹配关系图
 bool save_graph = false;
 std::string save_graph_to; // 保存路径
-string result_name = "C:/Users/Administrator/Desktop/stitch_code/data1/result.jpg"; // 文件名称
+string result_name = "C:/Users/Administrator/Desktop/stitch_code/result.jpg"; // 文件名称
 // 图像投影几何类型
 // affine 仿射投影，适合简单平面场景
 // plane 平面投影，适用于小视角拼接
@@ -68,7 +68,7 @@ string warp_type = "compressedPlaneA2B1";
 // 缝合线算法
 //（图方法：voronoi、基于颜色的图切割方法：gc_color、基于颜色和梯度的图切割方法：gc_colorgrad）
 //（基于颜色的动态规划：dp_color、基于颜色和梯度的动态规划：dp_colorgrad）
-string seam_find_type = "gc_color";
+string seam_find_type = "gc_colorgrad";
 // 曝光补偿
 //（分块增益补偿：GAIN_BLOCKS、全局增益补偿：GAIN、不补偿：no）
 //（按RGB全局增益补偿：CHANNELS、按RGB分块补偿：CHANNELS_BLOCKS）
@@ -77,9 +77,9 @@ int expos_comp_nr_feeds = 1; // 补偿迭代次数
 int expos_comp_nr_filtering = 2; // 增益过滤迭代次数
 int expos_comp_block_size = 32; // 分块大小
 // 图像融合（多带融合：MULTI_BAND、羽化融合：FEATHER、不融合：no）
-int blend_type = Blender::FEATHER;
+int blend_type = Blender::MULTI_BAND;
 // 融合强度（范围[0,100]）
-float blend_strength = 5;
+float blend_strength = 15;
 // 时间序列输出（原图方式输出：AS_IS、裁剪方式输出：CROP）
 bool timelapse = false;
 int timelapse_type = Timelapser::AS_IS;
@@ -649,10 +649,6 @@ int stitch()
     }
 
     LOGLN("总耗时: " << ((getTickCount() - app_start_time) / getTickFrequency()) << " sec" <<endl);
-
-    // 存储拼接好的图片
-    img_names.clear();
-    img_names.push_back(result_name);
 
     return 0;
 }
