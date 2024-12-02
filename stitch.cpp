@@ -645,6 +645,8 @@ int stitch()
 
         LOGLN("拼接耗时: " << ((getTickCount() - t) / getTickFrequency()) << " sec");
 
+        imwrite(result_name, result);
+
     }
 
     LOGLN("总耗时: " << ((getTickCount() - app_start_time) / getTickFrequency()) << " sec" <<endl);

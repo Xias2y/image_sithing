@@ -18,7 +18,7 @@ int main()
     TicToc time;
     int skepCount = 75;
 
-    string data_path = "C:/Users/Administrator/Desktop/stitch_code/data1/*.jpg";
+    string data_path = "C:/Users/Administrator/Desktop/stitch_code/data0/*.jpg";
     vector<string> pre_path;
     glob(data_path, pre_path);
     img_names.push_back(pre_path[0]);
