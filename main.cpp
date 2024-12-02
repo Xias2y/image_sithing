@@ -4,11 +4,19 @@
 #endif
 
 vector<string> img_names;
+/*
+如果通过摄像头视野+飞机高度+飞行速度
+来计算跳帧数量，是最好的
+
+一次10张：2.1s
+一次12张：3.1s
+一次14张：4s
+*/
 
 int main()
 {
     TicToc time;
-    int skepCount = 50;
+    int skepCount = 75;
 
     string data_path = "C:/Users/Administrator/Desktop/stitch_code/data1/*.jpg";
     vector<string> pre_path;

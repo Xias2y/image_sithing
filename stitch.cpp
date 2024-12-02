@@ -46,7 +46,7 @@ WaveCorrectKind wave_correct = detail::WAVE_CORRECT_VERT;
 // 是否保存匹配关系图
 bool save_graph = false;
 std::string save_graph_to; // 保存路径
-string result_name = "C:/Users/Administrator/Desktop/stitch_code/result.jpg"; // 文件名称
+string result_name = "C:/Users/Administrator/Desktop/stitch_code/result.png"; // 文件名称
 // 图像投影几何类型
 // affine 仿射投影，适合简单平面场景
 // plane 平面投影，适用于小视角拼接
@@ -256,7 +256,7 @@ int stitch()
         LOGLN("错误：筛选后图片少于2张");
         return -1;
     }
-    // cout << "置信度筛选后图片数量： " << num_images << endl;
+    cout << "置信度筛选后图片数量： " << num_images << endl;
 
     // 几何估计
     LOGLN("======= 束调整中 =======");
@@ -645,7 +645,6 @@ int stitch()
 
         LOGLN("拼接耗时: " << ((getTickCount() - t) / getTickFrequency()) << " sec");
 
-        imwrite(result_name, result);
     }
 
     LOGLN("总耗时: " << ((getTickCount() - app_start_time) / getTickFrequency()) << " sec" <<endl);
