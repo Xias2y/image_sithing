@@ -12,13 +12,13 @@ bool preview = false;
 // GPU加速
 bool try_cuda = false;
 // 特征匹配分辨率（0.6 = 缩小到0.6百万像素）（可-1）
-double work_megapix = 0.6;
+double work_megapix = 0.4;
 // 缝合线估计分辨率
 double seam_megapix = 0.1;
 // 最终拼接图像分辨率
 double compose_megapix = -1;
 // 几何变换置信度（删除低于置信度的图片）
-float conf_thresh = 0;
+float conf_thresh = 1.f;
 // 特征匹配点置信度
 #ifdef HAVE_OPENCV_XFEATURES2D
 // 特征点种类（surf、orb、sift、akaze）
@@ -31,15 +31,15 @@ float match_conf = 0.3f;
 // 匹配算法（透视：homography、仿射：affine）
 string matcher_type = "homography";
 // 图像匹配范围（-1：全连接）（不想全连接只能homography）
-int range_width = 1;
+int range_width = -1;
 // 几何变换估计器
 string estimator_type = "homography";
 // BA代价函数
 //（最小化重投影误差：reproj、最小化光线误差：ray、最小化仿射误差：affine、不调整：no）
-string ba_cost_func = "reproj";
+string ba_cost_func = "ray";
 // BA优化参数（<fx><skew><ppx><aspect><ppy>）
 // x表示优化，_表示不优化
-string ba_refine_mask = "x_x_x";
+string ba_refine_mask = "x___x";
 // 波形效应矫正（水平方向：WAVE_CORRECT_HORIZ、垂直方向：WAVE_CORRECT_VERT）
 bool do_wave_correct = true;
 WaveCorrectKind wave_correct = detail::WAVE_CORRECT_VERT;
@@ -66,7 +66,7 @@ std::string save_graph_to; // 保存路径
 // paniniPortraitA1.5B1 Panini 人像投影，适合中等竖直视角
 // mercator 墨卡托投影，适合地图或宽视角场景
 // transverseMercator 横向墨卡托投影，适用于极地区域或横向视角拼接
-string warp_type = "compressedPlaneA2B1";
+string warp_type = "plane";
 // 缝合线算法
 //（图方法：voronoi、基于颜色的图切割方法：gc_color、基于颜色和梯度的图切割方法：gc_colorgrad）
 //（基于颜色的动态规划：dp_color、基于颜色和梯度的动态规划：dp_colorgrad）
@@ -96,10 +96,11 @@ int timelapse_type = Timelapser::AS_IS;
 */
 
 
-int tmp = 1;
+int tmp = 0; // 拼接结果编号
 
 int stitch()
 {
+    tmp++;
 #if ENABLE_LOG
     int64 app_start_time = getTickCount(); 
 #endif
@@ -188,7 +189,7 @@ int stitch()
 
         computeImageFeatures(finder, img, features[i]);
         features[i].img_idx = i;
-        LOGLN("图 #" << i + 1 << " 特征点数量: " << features[i].keypoints.size());
+        LOGLN("图 #" << i + 1 << " 特征点数量: " << features[i].keypoints.size() << "  " << img_names[i]);
 
         resize(full_img, img, Size(), seam_scale, seam_scale, INTER_LINEAR_EXACT);
         images[i] = img.clone();
@@ -240,11 +241,6 @@ int stitch()
     full_img_sizes = full_img_sizes_subset;
 
     //std::cout << "======= 检查几何估计输入 =======" << std::endl;
-    //std::cout << "特征点数量：" << features.size() << std::endl;
-    //for (size_t i = 0; i < features.size(); ++i) {
-    //    std::cout << "图 #" << i + 1 << " 特征点数量: " << features[i].keypoints.size() << std::endl;
-    //}
-
     //std::cout << "匹配对数量：" << pairwise_matches.size() << std::endl;
     //for (size_t i = 0; i < pairwise_matches.size(); ++i) {
     //    std::cout << "匹配对 #" << i + 1
@@ -357,6 +353,7 @@ int stitch()
     }
 
     Ptr<WarperCreator> warper_creator;
+
 #ifdef HAVE_OPENCV_CUDAWARPING
     if (try_cuda && cuda::getCudaEnabledDeviceCount() > 0)
     {
@@ -403,7 +400,6 @@ int stitch()
         else if (warp_type == "transverseMercator")
             warper_creator = makePtr<cv::TransverseMercatorWarper>();
     }
-
     if (!warper_creator)
     {
         cout << "错误：无法创建投影 '" << warp_type << "'\n";
@@ -411,7 +407,6 @@ int stitch()
     }
     // 几何变换
     Ptr<RotationWarper> warper = warper_creator->create(static_cast<float>(warped_image_scale * seam_work_aspect));
-
     for (int i = 0; i < num_images; ++i)
     {
         Mat_<float> K;
@@ -425,7 +420,6 @@ int stitch()
 
         warper->warp(masks[i], K, cameras[i].R, INTER_NEAREST, BORDER_CONSTANT, masks_warped[i]);
     }
-
     vector<UMat> images_warped_f(num_images);
     for (int i = 0; i < num_images; ++i)
         images_warped[i].convertTo(images_warped_f[i], CV_32F);
@@ -648,15 +642,13 @@ int stitch()
         LOGLN("拼接耗时: " << ((getTickCount() - t) / getTickFrequency()) << " sec");
 
         string base_path = "C:/Users/Administrator/Desktop/stitch_code/result/";
-        string result_name = base_path + std::to_string(tmp) + ".png";
+        string result_name = base_path + std::to_string(tmp) + ".jpg";
         
         imwrite(result_name, result);
 
-        tmp++;
-
     }
 
-    LOGLN("总耗时: " << ((getTickCount() - app_start_time) / getTickFrequency()) << " sec" <<endl);
+    LOGLN("总耗时: " << ((getTickCount() - app_start_time) / getTickFrequency()) << " sec");
 
     return 0;
 }
