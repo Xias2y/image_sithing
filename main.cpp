@@ -19,10 +19,10 @@ int picture = 1; // 组计数器
 
 int main()
 {
-    int skepCount = 30; // 跳跃帧数
+    int skepCount = 1; // 跳跃帧数
 
     // string data_path = "C:/Users/Administrator/Desktop/stitch_code/result/*.jpg";
-    string data_path = "C:/Users/Administrator/Desktop/fly8/fly8/jpg1/*.jpg";
+    string data_path = "C:/Users/Administrator/Desktop/images/*.JPG";
 
     vector<string> pre_path;
     glob(data_path, pre_path);
@@ -32,7 +32,7 @@ int main()
     while (true)
     {
         TicToc time;
-        int skep = 8; // 每组skep张图
+        int skep = 30; // 每组skep张图
         cout << "第 " << picture << " 张图片" << endl;
         while (skep--)
         {

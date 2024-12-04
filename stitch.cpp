@@ -641,7 +641,7 @@ int stitch()
 
         LOGLN("Æ´½ÓºÄÊ±: " << ((getTickCount() - t) / getTickFrequency()) << " sec");
 
-        string base_path = "C:/Users/Administrator/Desktop/stitch_code/result/";
+        string base_path = "C:/Users/Administrator/Desktop/images/output";
         string result_name = base_path + std::to_string(tmp) + ".jpg";
         
         imwrite(result_name, result);
