@@ -1,0 +1,1 @@
+# opencv高级接口stitch的低级调用stitch_detail官方微改，拿来就能用
